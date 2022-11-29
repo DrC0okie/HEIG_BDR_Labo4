@@ -1,10 +1,6 @@
 # HEIG_BDR_Labo4
 ### Exercice 1
 
-
-### Exercice3.1
-
-```sql
 ```postgresql
 CREATE OR REPLACE FUNCTION majoration()
     RETURNS TRIGGER AS
@@ -26,7 +22,6 @@ EXECUTE FUNCTION majoration();
 
 #### Vérification
 
-```sql
 ```postgresql
 INSERT INTO payment(payment_id, customer_id, staff_id, rental_id, amount, payment_date)
 VALUES (8, 269, 2, 7, 100, '2017-01-24 21:40:19.996577 +00:00');
