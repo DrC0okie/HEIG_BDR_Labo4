@@ -1,9 +1,11 @@
 # HEIG_BDR_Labo4
+### Exercice 1
 
 
 ### Exercice3.1
 
 ```sql
+```postgresql
 CREATE OR REPLACE FUNCTION majoration()
     RETURNS TRIGGER AS
 $$
@@ -25,6 +27,7 @@ EXECUTE FUNCTION majoration();
 #### Vérification
 
 ```sql
+```postgresql
 INSERT INTO payment(payment_id, customer_id, staff_id, rental_id, amount, payment_date)
 VALUES (8, 269, 2, 7, 100, '2017-01-24 21:40:19.996577 +00:00');
 
@@ -33,6 +36,7 @@ FROM payment
 WHERE payment_id = 8;
 ```
 
+<<<<<<< Updated upstream
 ### Exercice 3.3
 
 ```sql
@@ -99,3 +103,89 @@ WHERE r.return_date IS NULL
 AND (r.rental_date + f.rental_duration * INTERVAL '1 day' < now());
 ```
 
+=======
+### Exercice 2
+
+```postgresql
+CREATE TABLE staff_creation_log
+(
+    username     varchar(16) NOT NULL,
+    when_created timestamp NOT NULL
+);
+
+CREATE OR REPLACE FUNCTION staff_creation_log()
+    RETURNS TRIGGER
+    AS
+$$
+BEGIN
+    INSERT INTO staff_creation_log VALUES(NEW.username, now());
+    RETURN NEW;
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER staff_creation
+    BEFORE INSERT
+    ON staff
+    FOR EACH ROW
+    EXECUTE PROCEDURE staff_creation_log();
+
+INSERT INTO staff (
+                   first_name, 
+                   last_name, 
+                   address_id, 
+                   email, 
+                   store_id, 
+                   username, 
+                   password)
+
+            values
+                ('Thomas',
+                 'Germano',
+                 50,
+                 'thomas.germano@sekilastaff.com',
+                 1,
+                 'catwayne',
+                 'wallah'
+                )
+;
+```
+#### Vérification
+```postgresql
+SELECT username, when_created
+FROM staff_creation_log
+WHERE username = 'catwayne';
+```
+
+### Exercice 4
+
+```postgresql
+CREATE OR REPLACE VIEW staff_address
+AS
+SELECT phone, first_name, last_name, address, postal_code, city, district, country
+    FROM staff
+    INNER JOIN address a
+        ON a.address_id = staff.address_id
+    INNER JOIN city c
+        ON c.city_id = a.city_id
+    INNER JOIN country co
+        ON c.country_id = co.country_id
+;
+```
+#### Vérification
+```postgresql
+SELECT * FROM staff_address;
+```
+##### Réponse
+Oui, car la vue satisfait toues les conditions qui lui permet d'être modifiable, c'est-à-dire :
+
+- La vue doit avoir exactement une entrée (une table ou une autre vue modifiable) dans la liste FROM.
+
+- La définition de la vue ne doit pas contenir de clauses WITH, DISTINCT, GROUP  BY, HAVING, LIMIT ou OFFSET au niveau le plus haut.
+
+- La définition de la vue ne doit pas contenir d’opérations sur des ensembles (UNION, INTERSECT ou EXCEPT) au niveau le plus haut.
+
+- La liste de sélection de la vue ne doit pas contenir d’agrégats, de fonctions de  fenêtrage ou de fonctions renvoyant des ensembles de lignes.
+
+### Exercice 6
+>>>>>>> Stashed changes

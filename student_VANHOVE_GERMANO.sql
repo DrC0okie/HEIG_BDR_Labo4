@@ -57,7 +57,15 @@ CREATE TRIGGER staff_creation
     FOR EACH ROW
     EXECUTE PROCEDURE staff_creation_log();
 
-INSERT INTO staff (first_name, last_name, address_id, email, store_id, username, password)
+INSERT INTO staff (
+                   first_name,
+                   last_name,
+                   address_id,
+                   email,
+                   store_id,
+                   username,
+                   password)
+
             values
                 ('Thomas',
                  'Germano',
@@ -133,6 +141,8 @@ SELECT phone, first_name, last_name, address, postal_code, city, district, count
     INNER JOIN country co
         ON c.country_id = co.country_id
 ;
+
+SELECT * FROM staff_address;
 -- END Exercice 04
 
 -- Exercice 05
@@ -157,6 +167,9 @@ AND (r.rental_date + f.rental_duration * INTERVAL '1 day' < now());
 -- END Exercice 07
 
 -- Exercice 08
+SELECT COUNT(*)
+FROM rental
+WHERE date_trunc()
 -- END Exercice 08
 
 --
