@@ -136,6 +136,17 @@ SELECT phone, first_name, last_name, address, postal_code, city, district, count
 -- END Exercice 04
 
 -- Exercice 05
+
+CREATE VIEW non_payments
+AS
+    SELECT first_name, last_name, email, title, EXTRACT(DAY FROM (now() - r.rental_date)) AS nb_days_late
+FROM customer c
+INNER JOIN rental r ON c.customer_id = r.customer_id
+INNER JOIN inventory i ON r.inventory_id = i.inventory_id
+INNER JOIN film f ON i.film_id = f.film_id
+WHERE r.return_date IS NULL
+AND (r.rental_date + f.rental_duration * INTERVAL '1 day' < now());
+
 -- END Exercice 05
 
 -- Exercice 06
