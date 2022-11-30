@@ -147,7 +147,7 @@ SELECT * FROM staff_address;
 
 -- Exercice 05
 
-CREATE VIEW non_payments
+CREATE OR REPLACE VIEW non_payments
 AS
     SELECT first_name, last_name, email, title, EXTRACT(DAY FROM (now() - r.rental_date)) AS nb_days_late
 FROM customer c
@@ -160,16 +160,29 @@ AND (r.rental_date + f.rental_duration * INTERVAL '1 day' < now());
 -- END Exercice 05
 
 -- Exercice 06
-
+CREATE OR REPLACE VIEW clients_with_more_than_3_days_late
+AS
+SELECT
+    *
+FROM non_payments
+WHERE nb_days_late > 3;
 -- END Exercice 06
 
 -- Exercice 07
 -- END Exercice 07
 
 -- Exercice 08
-SELECT COUNT(*)
+CREATE OR REPLACE VIEW count_rental_per_day
+AS
+SELECT
+    substr(CAST(DATE_TRUNC('day', rental_date) AS VARCHAR), 1, 10) as jour,
+    count(*) as compte
 FROM rental
-WHERE date_trunc()
+GROUP BY jour;
+
+SELECT *
+FROM count_rental_per_day
+WHERE jour = '2005-08-01';
 -- END Exercice 08
 
 --
@@ -180,4 +193,18 @@ WHERE date_trunc()
 -- END Exercice 09
 
 -- Exercice 10
+CREATE OR REPLACE FUNCTION update_last_update_on_film()
+RETURNS TIMESTAMP
+    AS
+$$
+BEGIN
+    UPDATE film
+    set last_update = NOW();
+    RETURN NOW();
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
 -- END Exercice 10
