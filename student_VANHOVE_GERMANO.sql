@@ -14,7 +14,7 @@ BEGIN
     NEW.amount = NEW.amount * 1.08;
     NEW.payment_date = now();
     RETURN NEW;
-end;
+END;
 $$
     LANGUAGE plpgsql;
 
@@ -25,12 +25,24 @@ CREATE OR REPLACE TRIGGER majoration_on_insert
 EXECUTE FUNCTION majoration();
 
 -- Vérification
-INSERT INTO payment(payment_id, customer_id, staff_id, rental_id, amount, payment_date)
-VALUES (8, 269, 2, 7, 100, '2017-01-24 21:40:19.996577 +00:00');
+INSERT INTO payment(
+					payment_id,
+					customer_id,
+					staff_id,
+					rental_id, 
+					amount,
+					payment_date)
+			VALUES (
+					8, 
+					269,
+					2,
+					7,
+					100,
+					'2017-01-24 21:40:19.996577 +00:00');
 
 SELECT *
-FROM payment
-WHERE payment_id = 8;
+	FROM payment
+	WHERE payment_id = 8;
 -- END Exercice 01
 
 -- Exercice 02
@@ -57,6 +69,7 @@ CREATE TRIGGER staff_creation
     FOR EACH ROW
     EXECUTE PROCEDURE staff_creation_log();
 
+-- Vérification
 INSERT INTO staff (
                    first_name,
                    last_name,
@@ -66,7 +79,7 @@ INSERT INTO staff (
                    username,
                    password)
 
-            values
+            VALUES
                 ('Thomas',
                  'Germano',
                  50,
@@ -77,13 +90,11 @@ INSERT INTO staff (
                 );
 
 SELECT username, when_created
-FROM staff_creation_log
-WHERE username = 'catwayne';
-
+	FROM staff_creation_log
+	WHERE username = 'catwayne';
 -- END Exercice 02
 
 -- Exercice 03
-
 CREATE OR REPLACE FUNCTION update_mail()
     RETURNS TRIGGER AS
 $$
@@ -107,21 +118,39 @@ CREATE OR REPLACE TRIGGER update_mail_on_insert
 EXECUTE FUNCTION update_mail();
 
 -- Vérification on insert
-INSERT INTO customer(customer_id, store_id, first_name, last_name, email, address_id, active, create_date, last_update)
-VALUES (600, 2, 'Tim', 'VanHove', 'test@test.org', 605, true, '2017-02-14 00:00:00.000000 +00:00',
-        '2017-02-15 09:57:20.000000 +00:00');
+INSERT INTO customer(
+					customer_id,
+					store_id,
+					first_name, 
+					last_name,
+					email,
+					address_id,
+					active,
+					create_date,
+					last_update)
+			VALUES (
+					600,
+					2, 
+					'Tim',
+					'VanHove',
+					'test@test.org',
+					605,
+					true,
+					'2017-02-14 00:00:00.000000 +00:00',
+					'2017-02-15 09:57:20.000000 +00:00');
+					
 SELECT email, last_name, first_name
-FROM customer
-WHERE customer_id = 600;
+	FROM customer
+	WHERE customer_id = 600;
 
 -- Vérification on update
 UPDATE customer
-SET first_name = 'Thomas', last_name  = 'Germano'
-WHERE customer_id = 600;
+	SET first_name = 'Thomas', last_name  = 'Germano'
+	WHERE customer_id = 600;
 
 SELECT email, last_name, first_name
-FROM customer
-WHERE customer_id = 600;
+	FROM customer
+	WHERE customer_id = 600;
 
 -- END Exercice 03
 
@@ -150,13 +179,16 @@ SELECT * FROM staff_address;
 -- Le nom, prénom, mail, titre du film et le nombre de jours de retard
 CREATE OR REPLACE VIEW non_payments
 AS
-    SELECT first_name, last_name, email, title, EXTRACT(DAY FROM (now() - r.rental_date)) AS nb_days_late
-FROM customer c
-INNER JOIN rental r ON c.customer_id = r.customer_id
-INNER JOIN inventory i ON r.inventory_id = i.inventory_id
-INNER JOIN film f ON i.film_id = f.film_id
+SELECT first_name, last_name, email, title, EXTRACT(DAY FROM (now() - r.rental_date)) AS nb_days_late
+	FROM customer c
+	INNER JOIN rental r 
+		ON c.customer_id = r.customer_id
+	INNER JOIN inventory i 
+		ON r.inventory_id = i.inventory_id
+	INNER JOIN film f 
+		ON i.film_id = f.film_id
 WHERE r.return_date IS NULL
-AND (r.rental_date + f.rental_duration * INTERVAL '1 day' < now());
+	AND (r.rental_date + f.rental_duration * INTERVAL '1 day' < now());
 
 -- END Exercice 05
 
@@ -165,21 +197,22 @@ CREATE OR REPLACE VIEW clients_with_more_than_3_days_late
 AS
 SELECT
     *
-FROM non_payments
-WHERE nb_days_late > 3;
+	FROM non_payments
+	WHERE nb_days_late > 3;
 -- END Exercice 06
 
 -- Exercice 07
 CREATE OR REPLACE VIEW location_per_client
 AS
 SELECT c.customer_id, first_name, last_name, COUNT(*) AS nb_locations
-FROM customer c
-         INNER JOIN rental r on c.customer_id = r.customer_id
+	FROM customer c
+    INNER JOIN rental r 
+			ON c.customer_id = r.customer_id
 GROUP BY first_name, last_name, c.customer_id;
 
 
 SELECT *
-FROM location_per_client
+	FROM location_per_client
 ORDER BY nb_locations DESC
 LIMIT 20;
 -- END Exercice 07
@@ -188,9 +221,9 @@ LIMIT 20;
 CREATE OR REPLACE VIEW count_rental_per_day
 AS
 SELECT
-    substr(CAST(DATE_TRUNC('day', rental_date) AS VARCHAR), 1, 10) AS jour,
-    count(*) as compte
-FROM rental
+    SUBSTR(CAST(DATE_TRUNC('day', rental_date) AS VARCHAR), 1, 10) AS jour,
+    COUNT(*) AS compte
+	FROM rental
 GROUP BY jour;
 
 SELECT *
@@ -229,15 +262,17 @@ SELECT get_nb_film_per_store(2);
 SELECT DISTINCT
     s.store_id,
     COUNT(DISTINCT film_id)
-FROM store s
+	FROM store s
     INNER JOIN inventory i
         ON s.store_id = i.store_id
 GROUP BY s.store_id
     ORDER BY s.store_id;
+	
+SELECT DISTINCT last_update
+	FROM film;
 -- END Exercice 09
 
-SELECT DISTINCT last_update
-from film;
+
 -- Exercice 10
 CREATE OR REPLACE PROCEDURE update_last_update_on_film()
 LANGUAGE plpgsql
@@ -250,8 +285,10 @@ END;
 $$;
 
 CALL update_last_update_on_film();
--- END Exercice 10
 -- la date avant l'update est : 2017-09-10
 -- et après après l'update est : 2022-12-05
 SELECT DISTINCT last_update
-from film;
+	FROM film;
+
+-- END Exercice 10
+
