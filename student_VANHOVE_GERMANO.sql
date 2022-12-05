@@ -169,6 +169,18 @@ WHERE nb_days_late > 3;
 -- END Exercice 06
 
 -- Exercice 07
+CREATE OR REPLACE VIEW location_per_client
+AS
+SELECT c.customer_id, first_name, last_name, COUNT(*) AS nb_locations
+FROM customer c
+         INNER JOIN rental r on c.customer_id = r.customer_id
+GROUP BY first_name, last_name, c.customer_id;
+
+
+SELECT *
+FROM location_per_client
+ORDER BY nb_locations DESC
+LIMIT 20;
 -- END Exercice 07
 
 -- Exercice 08
