@@ -175,7 +175,7 @@ WHERE nb_days_late > 3;
 CREATE OR REPLACE VIEW count_rental_per_day
 AS
 SELECT
-    substr(CAST(DATE_TRUNC('day', rental_date) AS VARCHAR), 1, 10) as jour,
+    substr(CAST(DATE_TRUNC('day', rental_date) AS VARCHAR), 1, 10) AS jour,
     count(*) as compte
 FROM rental
 GROUP BY jour;
@@ -190,18 +190,49 @@ WHERE jour = '2005-08-01';
 ---------------------------
 
 -- Exercice 09
+CREATE OR REPLACE FUNCTION get_nb_film_per_store(id_store integer)
+RETURNS INT
+LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    film_store_count integer;
+BEGIN
+    SELECT DISTINCT
+        COUNT(DISTINCT film_id) INTO film_store_count
+        FROM store s
+        INNER JOIN inventory i
+            ON s.store_id = i.store_id
+        WHERE s.store_id = id_store;
+    RETURN film_store_count;
+END;
+$$;
+
+SELECT get_nb_film_per_store(1);
+
+SELECT get_nb_film_per_store(2);
+
+
+SELECT DISTINCT
+    s.store_id,
+    COUNT(DISTINCT film_id)
+FROM store s
+    INNER JOIN inventory i
+        ON s.store_id = i.store_id
+GROUP BY s.store_id
+    ORDER BY s.store_id;
 -- END Exercice 09
 
 SELECT DISTINCT last_update
 from film;
 -- Exercice 10
 CREATE OR REPLACE PROCEDURE update_last_update_on_film()
-language plpgsql
-as $$
+LANGUAGE plpgsql
+AS $$
 BEGIN
     UPDATE film
-    set last_update = NOW();
-    commit;
+    SET last_update = NOW();
+    COMMIT;
 END;
 $$;
 
