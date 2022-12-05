@@ -146,7 +146,8 @@ SELECT * FROM staff_address;
 -- END Exercice 04
 
 -- Exercice 05
-
+-- Pour pouvoir envoyer un mail, nous estimons qu'il faut connaitre
+-- Le nom, prénom, mail, titre du film et le nombre de jours de retard
 CREATE OR REPLACE VIEW non_payments
 AS
     SELECT first_name, last_name, email, title, EXTRACT(DAY FROM (now() - r.rental_date)) AS nb_days_late
