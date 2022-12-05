@@ -192,19 +192,22 @@ WHERE jour = '2005-08-01';
 -- Exercice 09
 -- END Exercice 09
 
+SELECT DISTINCT last_update
+from film;
 -- Exercice 10
-CREATE OR REPLACE FUNCTION update_last_update_on_film()
-RETURNS TIMESTAMP
-    AS
-$$
+CREATE OR REPLACE PROCEDURE update_last_update_on_film()
+language plpgsql
+as $$
 BEGIN
     UPDATE film
     set last_update = NOW();
-    RETURN NOW();
+    commit;
 END;
-$$
-LANGUAGE plpgsql;
+$$;
 
-
-
+CALL update_last_update_on_film();
 -- END Exercice 10
+-- la date avant l'update est : 2017-09-10
+-- et après après l'update est : 2022-12-05
+SELECT DISTINCT last_update
+from film;
